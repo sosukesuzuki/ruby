@@ -5201,6 +5201,12 @@ rb_fix_aref(VALUE fix, VALUE idx)
     return INT2FIX(0);
 }
 
+static VALUE
+rb_int_urshift(VALUE x, VALUE y)
+{
+    return Qnil;
+}
+
 
 /* copied from "r_less" in range.c */
 /* compares _a_ and _b_ and returns:
@@ -6288,6 +6294,7 @@ Init_Numeric(void)
 
     rb_define_method(rb_cInteger, "<<", rb_int_lshift, 1);
     rb_define_method(rb_cInteger, ">>", rb_int_rshift, 1);
+    rb_define_method(rb_cInteger, ">>>", rb_int_urshift, 1);
 
     rb_define_method(rb_cInteger, "digits", rb_int_digits, -1);
 
