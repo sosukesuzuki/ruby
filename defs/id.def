@@ -116,6 +116,7 @@ token_ops = %[\
   MOD           %
   LTLT          <<      LSHFT
   GTGT          >>      RSHFT
+  GTGTGT        >>>     URSHFT
   LT            <
   LE            <=      LEQ
   GT            >

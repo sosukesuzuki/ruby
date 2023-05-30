@@ -5196,6 +5196,38 @@ rb_fix_aref(VALUE fix, VALUE idx)
     return INT2FIX(0);
 }
 
+static VALUE
+fix_urshift(long val, unsigned long i)
+{
+    uint32_t uval = (uint32_t)val;
+    return LONG2FIX(uval >> i);
+}
+
+static VALUE
+rb_fix_urshift(VALUE x, VALUE y)
+{
+    long i, val;
+
+    val = FIX2LONG(x);
+    if (!val) return (rb_to_int(y), INT2FIX(0));
+    if (!FIXNUM_P(y))
+        return rb_big_rshift(rb_int2big(val), y);
+    i = FIX2ULONG(y);
+    if (i == 0) return x;
+    if (i < 0)
+        return fix_lshift(val, (unsigned long)-i);
+    return fix_urshift(val, i);
+}
+
+static VALUE
+rb_int_urshift(VALUE x, VALUE y)
+{
+    if (FIXNUM_P(x)) {
+        return rb_fix_urshift(x, y);
+    }
+    return Qnil;
+}
+
 
 /* copied from "r_less" in range.c */
 /* compares _a_ and _b_ and returns:
@@ -6283,6 +6315,7 @@ Init_Numeric(void)
 
     rb_define_method(rb_cInteger, "<<", rb_int_lshift, 1);
     rb_define_method(rb_cInteger, ">>", rb_int_rshift, 1);
+    rb_define_method(rb_cInteger, ">>>", rb_int_urshift, 1);
 
     rb_define_method(rb_cInteger, "digits", rb_int_digits, -1);
 

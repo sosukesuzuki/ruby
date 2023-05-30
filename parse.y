@@ -584,6 +584,7 @@ parser_token2id(enum yytokentype tok)
       TOKEN2ID(tASET);
       TOKEN2ID(tLSHFT);
       TOKEN2ID(tRSHFT);
+      TOKEN2ID(tURSHFT);
       TOKEN2ID(tANDDOT);
       TOKEN2ID(tCOLON2);
       TOKEN2ID(tCOLON3);
@@ -1525,6 +1526,7 @@ static int looking_at_eol_p(struct parser_params *p);
 %token tASET		RUBY_TOKEN(ASET)   "[]="
 %token tLSHFT		RUBY_TOKEN(LSHFT)  "<<"
 %token tRSHFT		RUBY_TOKEN(RSHFT)  ">>"
+%token tURSHFT      RUBY_TOKEN(URSHFT) ">>>"
 %token <id> tANDDOT	RUBY_TOKEN(ANDDOT) "&."
 %token <id> tCOLON2	RUBY_TOKEN(COLON2) "::"
 %token tCOLON3		":: at EXPR_BEG"
@@ -1576,7 +1578,7 @@ static int looking_at_eol_p(struct parser_params *p);
 %left  '>' tGEQ '<' tLEQ
 %left  '|' '^'
 %left  '&'
-%left  tLSHFT tRSHFT
+%left  tLSHFT tRSHFT tURSHFT
 %left  '+' '-'
 %left  '*' '/' '%'
 %right tUMINUS_NUM tUMINUS
@@ -2592,6 +2594,7 @@ op		: '|'		{ ifndef_ripper($$ = '|'); }
                 | tNEQ		{ ifndef_ripper($$ = tNEQ); }
                 | tLSHFT	{ ifndef_ripper($$ = tLSHFT); }
                 | tRSHFT	{ ifndef_ripper($$ = tRSHFT); }
+                | tURSHFT   { ifndef_ripper($$ = tURSHFT); }
                 | '+'		{ ifndef_ripper($$ = '+'); }
                 | '-'		{ ifndef_ripper($$ = '-'); }
                 | '*'		{ ifndef_ripper($$ = '*'); }
@@ -2827,6 +2830,10 @@ arg		: lhs '=' lex_ctxt arg_rhs
                 | arg tRSHFT arg
                     {
                         $$ = call_bin_op(p, $1, idGTGT, $3, &@2, &@$);
+                    }
+                | arg tURSHFT arg
+                    {
+                        $$ = call_bin_op(p, $1, idGTGTGT, $3, &@2, &@$);
                     }
                 | arg tANDOP arg
                     {
@@ -10058,6 +10065,10 @@ parser_yylex(struct parser_params *p)
                 set_yylval_id(idGTGT);
                 SET_LEX_STATE(EXPR_BEG);
                 return tOP_ASGN;
+            }
+            pushback(p, c);
+            if ((c = nextc(p)) == '>') {
+                return tURSHFT;
             }
             pushback(p, c);
             return tRSHFT;
