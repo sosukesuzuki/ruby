@@ -128,6 +128,12 @@ class TestFixnum < Test::Unit::TestCase
     assert_equal(-0x40000000, (-0x80000000) >> 1)
   end
 
+  def test_urshift
+    assert_equal(0x20000000, 0x40000000 >>> 1)
+    assert_equal(0x60000000, (-0x40000000) >>> 1)
+    assert_equal(0x40000000, (-0x80000000) >>> 1)
+  end
+
   def test_abs
     assert_equal(0x40000000, (-0x40000000).abs)
     assert_equal(0x4000000000000000, (-0x4000000000000000).abs)
